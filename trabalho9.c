@@ -6,22 +6,38 @@ int main() {
     scanf("%d", &cap);
 
     int *hash_table_element = calloc(cap, sizeof(int));
-    int *hash_table_marker = calloc(cap, sizeof(int));
-
+    int *hash_table_marker = calloc(cap, sizeof(int)); 
+    
     scanf("%d", &num_insertions);
 
     for (int i = 0; i < num_insertions; i++) {
+
         int value, pos, initial_pos;
+        int removed_pos = -1;
+
         scanf("%d", &value);
 
         initial_pos = pos = value % cap;
-        while (hash_table_marker[pos] == 1) {
+
+        while (hash_table_marker[pos] != 0) {
+
+            if (hash_table_marker[pos] == -1 && removed_pos == -1) {
+                removed_pos = pos;
+            }
+
+            if (hash_table_marker[pos] == 1 && hash_table_element[pos] == value) {
+                removed_pos = -1;
+                break;
+            }
+
             pos++;
             if (pos >= cap) pos = 0;
-            if (initial_pos == pos) break;
+            if (pos == initial_pos) break;
         }
 
-        if (hash_table_marker[pos] == 0) {
+        if (removed_pos != -1) pos = removed_pos;
+
+        if (hash_table_marker[pos] != 1) {
             hash_table_element[pos] = value;
             hash_table_marker[pos] = 1;
         }
@@ -34,12 +50,14 @@ int main() {
         scanf("%d", &value);
 
         initial_pos = pos = value % cap;
-        while (hash_table_marker[pos] == 1) {
-            if (hash_table_element[pos] == value) {
-                hash_table_element[pos] = 0;
+
+        while (hash_table_marker[pos] != 0) {
+
+            if (hash_table_marker[pos] == 1 && hash_table_element[pos] == value) {
                 hash_table_marker[pos] = -1;
                 break;
             }
+
             pos++;
             if (pos >= cap) pos = 0;
             if (pos == initial_pos) break;
@@ -49,22 +67,23 @@ int main() {
     scanf("%d", &num_searches);
 
     for (int i = 0; i < num_searches; i++) {
+
         int target, pos, initial_pos, found = 0, found_pos;
         scanf("%d", &target);
 
         initial_pos = pos = target % cap;
-        while (hash_table_marker[pos] == 1) {
-            if (hash_table_element[pos] == target) {
+
+        while (hash_table_marker[pos] != 0) {
+
+            if (hash_table_marker[pos] == 1 && hash_table_element[pos] == target) {
                 found = 1;
                 found_pos = pos;
                 break;
             }
+
             pos++;
             if (pos >= cap) pos = 0;
-            if (pos == initial_pos) {
-                found = 0;
-                break;
-            }
+            if (pos == initial_pos) break;
         }
 
         if (found)
@@ -72,6 +91,7 @@ int main() {
         else
             printf("%d ", -1);
     }
+
     printf("\n");
 
     free(hash_table_element);
